@@ -1,0 +1,15 @@
+{
+  "name": "seleniumwd",
+  "version": "1.0.0",
+  "description": "selenium webdriver in class folder",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"no testcase found\""
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chromedriver": "^140.0.2",
+    "selenium-webdriver": "^4.35.0"
+  }
+}
