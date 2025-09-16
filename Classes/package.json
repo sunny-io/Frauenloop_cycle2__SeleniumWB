@@ -1,0 +1,15 @@
+{
+  "name": "practicetest",
+  "version": "1.0.0",
+  "description": "testing practices with selenium webdriver",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"no tests fourn\""
+  },
+  "author": "sunny-io",
+  "license": "ISC",
+  "dependencies": {
+    "chromedriver": "^140.0.2",
+    "selenium-webdriver": "^4.35.0"
+  }
+}
