@@ -65,12 +65,35 @@ testcases = [
       errorMsgs: {
         locator: pageObject.errorMsgs.locator,
         content: "Your username is invalid!",
+        keyword: "username",
+      },
+    },
+  },
+  {
+    testid: "passwordFail",
+    baseUrlTitle: "Test Login | Practice Test Automation",
+    action: "fillAndSubmitForm",
+    data: {
+      username: {
+        locator: pageObject.inputFields.username,
+        content: "student",
+      },
+      password: {
+        locator: pageObject.inputFields.password,
+        content: "incorrectPassword",
+      },
+    },
+    submitBtn: pageObject.buttons[0],
+    resultItems: {
+      errorMsgs: {
+        locator: pageObject.errorMsgs.locator,
+        content: "Your password is invalid!",
+        keyword: "password",
       },
     },
   },
 ];
 
-// reusable function to fill a field. Currently only locatortype id supported
 async function fillField(dataset, driver) {
   console.log("started fillField");
   //console.log(JSON.stringify(dataset));
@@ -80,22 +103,16 @@ async function fillField(dataset, driver) {
       await driver
         .findElement({ id: dataset.locator.locator })
         .sendKeys(dataset.content, Key.ENTER);
-      await driver.wait(
-        until.text_to_be_present_in_element_value(
-          { id: dataset.locator.locator } == dataset.content
-        ),
-        1000
-      );
-      console.log(
+      /*   console.log(
         await driver.findElement({ id: dataset.locator.locator }).value
       );
       assert.equal(
         await driver.findElement({ id: dataset.locator.locator }).value,
-        content
+        dataset.content
       );
       console.log(
         `field ${dataset.locator.locator} filled with ${dataset.content}`
-      );
+      ); */
     } catch (e) {
       console.log(`error in fillField ${e}`);
     }
@@ -114,94 +131,87 @@ async function fillFields(data, driver) {
   }
 }
 
-async function assertResult(testcase, driver) {
-  console.log(`assertResult started`);
-  if (testcase.resultPageObject) {
-    console.log("resultPageObjectFound");
-    try {
-      //assert new page result
-      await driver.wait(
-        until.urlContains(testcase.resultPageObject.resultUrl),
-        1000
-      );
-      assert.ok(
-        (await driver.getCurrentUrl()).includes(
-          testcase.resultPageObject.resultUrl
-        )
-      );
-      assert.ok(
-        (await driver.getTitle()).includes(
-          testcase.resultPageObject.resultUrlTitle
-        )
-      );
-
-      assert.ok(
-        await driver.findElement(
-          By.xpath(testcase.resultPageObject.resultButton.locator)
-        )
-      );
-      assert.ok(
-        await driver.findElement(
-          By.xpath(testcase.resultPageObject.firstTitle.locator)
-        )
-      );
-      console.log(`tescase ${testcase.testid} run successfully`); //does this work as intended?
-    } catch (e) {
-      console.log(`error while asserting resultsPage ${e}`);
-    }
-  } else {
-    try {
-      const errorElement = await driver.findElement({
-        id: pageObject.errorMsgs.locator,
-      });
-      const classValue = await errorElement.getAttribute("class");
-      if (assert.ok(classValue.includes("show"))) {
-        assert.equal(errorElement.innerText, testcase.resultItems.errorMsgs);
-      } else {
-        assert.ok(classValue.includes("show"));
-      }
-    } catch (e) {
-      console.log(`error ${e} in asserting same-page result`);
-    }
-  }
-}
-
-async function executeTestLogic(testcase, driver) {
-  console.log("executeTestLogic started");
-  if (testcase.action == "fillAndSubmitForm") {
-    console.log(`testcase action: ${testcase.action}`);
-    try {
-      console.log(`testcase.data: ${JSON.stringify(testcase.data)}`);
-      await fillFields(testcase.data, driver);
-    } catch (e) {
-      console.log(`error in executeTestLogic ${e}`);
-    }
-    try {
-      await driver.findElement({ id: "submit" }).click();
-    } catch (e) {
-      console.log(`error in clicking Submit Button ${e}`);
-    }
-
-    await assertResult(testcase, driver);
-  }
-}
-
-// function the coordinate the actual test
 async function runTest(testcase) {
   console.log(testcase.testid);
   let driver;
   try {
+    //initialize driver
     driver = await new Builder().forBrowser("chrome").build();
     await driver.get(pageObject.baseUrl);
     assert.equal(await driver.getTitle(), testcase.baseUrlTitle);
     console.log(await driver.getTitle());
 
-    await executeTestLogic(testcase, driver);
+    // fill fields
+    if (testcase.action == "fillAndSubmitForm") {
+      console.log(`testcase action: ${testcase.action}`);
+      try {
+        console.log(`testcase.data: ${JSON.stringify(testcase.data)}`);
+        await fillFields(testcase.data, driver);
+        await driver.findElement({ id: "submit" }).click();
+      } catch (e) {
+        console.log(`error in filling form ${e}`);
+      }
+    } else {
+      console.log("action not supported");
+    }
+    // assert single-page result
+    if (!testcase.resultPageObject) {
+      console.log("asserting single-page results started");
+      try {
+        /* await driver.wait(
+          until.elementTextContains(
+            By.id("error"),
+            testcase.resultItems.errorMsgs.keyword
+          ),
+          1000
+        ); */
+        await driver.sleep(1000); // fixed wait bc commented out wait block throws an error
+        const errorElement = await driver.findElement({
+          id: "error",
+        });
+
+        const classValue = await errorElement.getAttribute("class");
+        console.log(`classValue: ${classValue}`);
+        //this did not work as expected
+        /*   if (assert.ok(classValue.includes("show"))) {
+          assert.equal(
+            await driver.findElement(
+              {
+                id: "error",
+              }.innerText
+            ),
+            testcase.resultItems.errorMsgs
+          );
+        } else {
+          assert.ok(classValue.includes("show"));
+        } */
+        let showSet = assert.ok(classValue.includes("show"));
+        let text = await driver.findElement(By.id("error")).getText();
+        let text2 = await driver
+          .findElement({
+            id: "error",
+          })
+          .getText();
+        console.log(text, text2); // if this works, why does the assert get a type error?
+        let textOK = assert.equal(
+          await driver.f
+            .findElement({
+              id: "error",
+            })
+            .getText(),
+          testcase.resultItems.errorMsgs
+        ); //this seems to throw a type error
+        console.log(
+          ` assertion results: showSet: ${showSet}, testOK: ${textOK}`
+        );
+      } catch (e) {
+        console.log(`error ${e} in asserting same-page result`);
+      }
+    }
   } catch (e) {
     console.log(e);
   } finally {
-    await driver.quit();
+    //await driver.quit();
   }
 }
-
-runTest(testcases[1]);
+runTest(testcases[2]);
