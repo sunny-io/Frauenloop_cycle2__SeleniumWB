@@ -194,16 +194,16 @@ async function runTest(testcase) {
           .getText();
         console.log(text, text2); // if this works, why does the assert get a type error?
         let textOK = assert.equal(
-          await driver.f
+          await driver
             .findElement({
               id: "error",
             })
             .getText(),
-          testcase.resultItems.errorMsgs
+          testcase.resultItems.errorMsgs.content
         ); //this seems to throw a type error
         console.log(
           ` assertion results: showSet: ${showSet}, testOK: ${textOK}`
-        );
+        ); //both variables show up as undefined in the console
       } catch (e) {
         console.log(`error ${e} in asserting same-page result`);
       }
