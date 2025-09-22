@@ -5,17 +5,17 @@ require("chromedriver");
 
 const testcases = [
   { Data: 9999999, "expected Output": "Valid Value" },
-  { Data: "#$%^#", "expected Output": "Invalid value" },
-  { Data: "hendd**", "expected Output": "valid value" },
-  { Data: "AHYEDIO", "expected Output": "valid value" },
-  { Data: "jdtegdj", "expected Output": "valid value" },
-  { Data: 3705490, "expected Output": "valid value" },
-  { Data: "ASHFbnj", "expected Output": "valid value" },
-  { Data: "hye76BG", "expected Output": "valid value" },
-  { Data: "23BgbG*", "expected Output": "valid value" },
-  { Data: "gyr$%8N", "expected Output": "invalid value" },
-  { Data: "bhtr50", "expected Output": "invalid value" },
-  { Data: "huy bh", "expected Output": "invalid value" },
+  { Data: "#$%^#", "expected Output": "Invalid Value" },
+  { Data: "hendd**", "expected Output": "Valid Value" },
+  { Data: "AHYEDIO", "expected Output": "Valid Value" },
+  { Data: "jdtegdj", "expected Output": "Valid Value" },
+  { Data: 3705490, "expected Output": "Valid Value" },
+  { Data: "ASHFbnj", "expected Output": "Valid Value" },
+  { Data: "hye76BG", "expected Output": "Valid Value" },
+  { Data: "23BgbG*", "expected Output": "Valid Value" },
+  { Data: "gyr$%8N", "expected Output": "Invalid Value" },
+  { Data: "bhtr50", "expected Output": "Invalid Value" },
+  { Data: "huy bh", "expected Output": "Invalid Value" },
 ];
 
 async function runTest(testcase) {
@@ -27,14 +27,21 @@ async function runTest(testcase) {
     );
     console.log(await driver.getTitle());
     await driver
-      .findElement({ css: "input[name = 'characters']" })
+      .findElement({ name: "characters" })
       .sendKeys(testcase.Data, Key.ENTER);
-    await driver.findElement({ css: "input[name = 'validate']" }).click();
+    await driver.findElement({ name: "validate" }).click();
 
-    await driver.sleep(1000);
-    assert.equal(
-      await driver.findElement({ css: "input[name = 'validation_message']" }),
-      testcase["expected output"]
+    await driver.sleep(2000);
+
+    let result = "";
+    result = await driver
+      .findElement({ name: "validation_message" })
+      .getAttribute("value");
+    console.log(result);
+
+    assert.equal(result, testcase["expected Output"]);
+    console.log(
+      `Test passed for ${testcase.Data}, ${testcase["expected Output"]}`
     );
   } catch (e) {
     console.log(e);
@@ -44,7 +51,12 @@ async function runTest(testcase) {
 }
 
 //loop through all testcases
-function runAllTests() {
-  for (let i = 0; i < testcases.length; i++) {}
+async function runAllTests() {
+  for (let i = 0; i < testcases.length; i++) {
+    await runTest(testcases[i]);
+  }
 }
-runTest(testcases[3]);
+
+//runTest(testcases[3]);
+
+runAllTests();
