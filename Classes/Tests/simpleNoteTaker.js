@@ -72,14 +72,7 @@ const testcases = [
       infoText: "Added Note",
     },
   },
-  {
-    testID: "snt005",
-    actions: {
-      action: ["openNote"],
-      notePosition: 0,
-      infoText: "Editing note: ",
-    },
-  },
+
   {
     testID: "snt006",
     actions: {
@@ -114,13 +107,18 @@ const testcases = [
     },
   },
   {
+    testID: "snt005",
+    actions: {
+      action: ["openNote"],
+      notePosition: 0,
+      infoText: "Editing note: ",
+    },
+  },
+  {
     testID: "snt009",
     actions: {
       action: ["BtnAction", "dialogue"],
-      fieldTitle: "",
-      fieldNote: "",
-      btn: "",
-      notePosition: "",
+      btn: "clear-notes",
       infoText: "No Notes Deleted",
       dialogue: "Cancel",
     },
@@ -129,13 +127,7 @@ const testcases = [
     testID: "snt010",
     actions: {
       action: ["BtnAction", "dialogue"],
-      fieldTitle: "",
-      fieldNote: "",
-      AddBtn: "",
-      CancelBtn: "",
-      UpdateBtn: "",
-      ClearAllBtn: "click",
-      notePosition: "",
+      btn: "clear-notes",
       infoText: "Deleted All Notes",
       dialogue: "OK",
     },
@@ -144,20 +136,28 @@ const testcases = [
 
 async function inputOutput(driver, actions) {
   try {
-    await driver
-      .findElement({ id: pageElements.titleInput })
-      .sendKeys(actions.fieldTitle);
-    await driver
-      .findElement({ id: "note-details-input" })
-      .sendKeys(actions.fieldNote);
-    await driver.findElement({ id: actions.btn }).click();
+    if (actions.fieldTitle) {
+      await driver
+        .findElement({ id: pageElements.titleInput })
+        .sendKeys(actions.fieldTitle);
+    }
+    if (actions.fieldNote) {
+      await driver
+        .findElement({ id: "note-details-input" })
+        .sendKeys(actions.fieldNote);
+    }
+    if (actions.btn) {
+      await driver.findElement({ id: actions.btn }).click();
 
-    await driver.sleep(1000);
-    let output = await driver
-      .findElement({ id: "note-status-details" })
-      .getText();
-    console.log(`note status: ${output}`);
-    return output;
+      await driver.sleep(1000);
+      let output = await driver
+        .findElement({ id: "note-status-details" })
+        .getText();
+      console.log(`note status: ${output}`);
+      return output;
+    } else {
+      return "Editing Note: ";
+    }
   } catch (e) {
     console.log(`Error in InputOutput: ${e}`);
   }
@@ -188,8 +188,10 @@ async function test() {
         let editButtons = await driver.findElements({
           css: ".edit-note-in-list",
         });
-        await editButtons[0].click();
-        console.log(notes[0].getText());
+        await editButtons[testcase.actions.notePosition].click();
+        await driver.sleep(1000);
+        let result = await inputOutput(driver, testcase.actions);
+        assert.equal(result, testcase.actions.infoText);
       }
     }
   } catch (e) {
