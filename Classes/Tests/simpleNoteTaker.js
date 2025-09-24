@@ -76,7 +76,7 @@ const testcases = [
     testID: "snt005",
     actions: {
       action: ["openNote"],
-      editButtons: "[0]",
+      notePosition: 0,
       infoText: "Editing note: ",
     },
   },
@@ -87,7 +87,7 @@ const testcases = [
       fieldTitle: "Edited 1st note",
       fieldNote: " some text for new note edited",
       btn: "update-note",
-      editButtons: "[0]",
+      notePosition: 0,
       infoText: "Updated Note",
     },
   },
@@ -98,7 +98,7 @@ const testcases = [
       fieldTitle: "Copied 2nd note",
       fieldNote: " Copied some text for new note",
       btn: "add-note",
-      editButtons: "[1]",
+      notePosition: 1,
       infoText: "Added Note",
     },
   },
@@ -109,7 +109,7 @@ const testcases = [
       fieldTitle: "Edited 1st note",
       fieldNote: " some text for new note edited",
       btn: "cancel-note",
-      editButtons: "[2]",
+      notePosition: 2,
       infoText: "Cancelled Edit",
     },
   },
@@ -120,7 +120,7 @@ const testcases = [
       fieldTitle: "",
       fieldNote: "",
       btn: "",
-      editButtons: "",
+      notePosition: "",
       infoText: "No Notes Deleted",
       dialogue: "Cancel",
     },
@@ -135,7 +135,7 @@ const testcases = [
       CancelBtn: "",
       UpdateBtn: "",
       ClearAllBtn: "click",
-      editButtons: "",
+      notePosition: "",
       infoText: "Deleted All Notes",
       dialogue: "OK",
     },
@@ -150,15 +150,9 @@ async function inputOutput(driver, actions) {
     await driver
       .findElement({ id: "note-details-input" })
       .sendKeys(actions.fieldNote);
-    if (actions.btn == "add-note") {
-      await driver.findElement({ id: "add-note" }).click();
-    } else if (actions.btn == "cancel-note") {
-      await driver.findElement({ id: "cancel-note" }).click();
-    } else if (actions.btn == "update-note") {
-      await driver.findElement({ id: "update-note" }).click();
-    }
+    await driver.findElement({ id: actions.btn }).click();
 
-    await driver.sleep(2000);
+    await driver.sleep(1000);
     let output = await driver
       .findElement({ id: "note-status-details" })
       .getText();
@@ -189,6 +183,13 @@ async function test() {
         console.log(testcase.actions.infoText);
         let result = await inputOutput(driver, testcase.actions);
         assert.equal(result, testcase.actions.infoText);
+      } else if (testcase.actions.action[0] == "openNote") {
+        console.log(testcase.actions.notePosition);
+        let editButtons = await driver.findElements({
+          css: ".edit-note-in-list",
+        });
+        await editButtons[0].click();
+        console.log(notes[0].getText());
       }
     }
   } catch (e) {
