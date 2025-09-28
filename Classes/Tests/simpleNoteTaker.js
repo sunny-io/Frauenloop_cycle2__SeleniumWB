@@ -32,6 +32,7 @@ const pageElements = {
 const testcases = [
   {
     testID: "snt001",
+    description: "create short note",
     actions: {
       action: ["createNewNote"],
       fieldTitle: "Title new note",
@@ -42,6 +43,7 @@ const testcases = [
   },
   {
     testID: "snt002",
+    description: "cancel note creation after input",
     actions: {
       action: ["createNewNote"],
       fieldTitle: "Title new note 2",
@@ -52,6 +54,7 @@ const testcases = [
   },
   {
     testID: "snt003",
+    description: "create note with title > 255char",
     actions: {
       action: ["createNewNote"],
       fieldTitle:
@@ -63,6 +66,7 @@ const testcases = [
   },
   {
     testID: "snt004",
+    description: "create note with text > 255char",
     actions: {
       action: ["createNewNote"],
       fieldTitle: "long note",
@@ -72,13 +76,21 @@ const testcases = [
       infoText: "Added Note",
     },
   },
-
+  {
+    testID: "snt005",
+    description: "open note to edit, do no action",
+    actions: {
+      action: ["openNote"],
+      notePosition: 0,
+      infoText: "Editing Note: ",
+    },
+  },
   {
     testID: "snt006",
+    description: "open note to edit, update: title and text",
     actions: {
       action: ["openNote", "BtnAction"],
-      fieldTitle: "Edited 1st note",
-      fieldNote: " some text for new note edited",
+      fieldTitle: "Edited 1st note title",
       btn: "update-note",
       notePosition: 0,
       infoText: "Updated Note",
@@ -86,10 +98,10 @@ const testcases = [
   },
   {
     testID: "snt007",
+    description: "open note to edit, save changes as new note",
     actions: {
-      actions: ["openNote", "BtnAction"],
+      action: ["openNote", "BtnAction"],
       fieldTitle: "Copied 2nd note",
-      fieldNote: " Copied some text for new note",
       btn: "add-note",
       notePosition: 1,
       infoText: "Added Note",
@@ -97,8 +109,9 @@ const testcases = [
   },
   {
     testID: "snt008",
+    description: "open note to edit, change data, cancel",
     actions: {
-      actions: ["openNote", "BtnAction"],
+      action: ["openNote", "BtnAction"],
       fieldTitle: "Edited 1st note",
       fieldNote: " some text for new note edited",
       btn: "cancel-note",
@@ -106,60 +119,109 @@ const testcases = [
       infoText: "Cancelled Edit",
     },
   },
-  {
-    testID: "snt005",
-    actions: {
-      action: ["openNote"],
-      notePosition: 0,
-      infoText: "Editing note: ",
-    },
-  },
+
   {
     testID: "snt009",
+    description: "delete note (confirm)",
     actions: {
-      action: ["BtnAction", "dialogue"],
-      btn: "clear-notes",
-      infoText: "No Notes Deleted",
-      dialogue: "Cancel",
+      action: ["delNote"],
+      btn: "delete-note-in-list",
+      notePosition: 2,
+      infoText: "Deleted Note: ",
+      confirm: true,
     },
   },
   {
     testID: "snt010",
+    description: "delete note (dismiss)",
     actions: {
-      action: ["BtnAction", "dialogue"],
-      btn: "clear-notes",
-      infoText: "Deleted All Notes",
-      dialogue: "OK",
+      action: ["delNote"],
+      btn: "delete-note-in-list",
+      notePosition: 1,
+      infoText: "Delete Note Cancelled",
+      confirm: false,
     },
   },
 ];
 
 async function inputOutput(driver, actions) {
+  //input function for note title and text
   try {
     if (actions.fieldTitle) {
+      // no changing of the title when editing an existing note without set new title
       await driver
         .findElement({ id: pageElements.titleInput })
         .sendKeys(actions.fieldTitle);
     }
     if (actions.fieldNote) {
+      // no changing of the note details when editing an existing note without set new text
       await driver
         .findElement({ id: "note-details-input" })
         .sendKeys(actions.fieldNote);
     }
     if (actions.btn) {
+      //no clicking the button if edit is aborted without cancel
       await driver.findElement({ id: actions.btn }).click();
 
       await driver.sleep(1000);
       let output = await driver
         .findElement({ id: "note-status-details" })
         .getText();
-      console.log(`note status: ${output}`);
+
       return output;
     } else {
+      //note status when editing is aborted without cancel
       return "Editing Note: ";
     }
   } catch (e) {
     console.log(`Error in InputOutput: ${e}`);
+  }
+}
+
+async function delNote(driver, actions) {
+  try {
+    // find all delete buttons
+    let delButtons = await driver.findElements({
+      css: ".delete-note-in-list",
+    });
+
+    //store id of note to be deleted and determine locator of note-to-be-deleted
+    let noteID = await delButtons[actions.notePosition].getAttribute(
+      "data-key"
+    );
+    //generate locator for later assertion
+    locator = `div.note-in-list[data-key = "${noteID}"]`;
+
+    //click delete button
+    await delButtons[actions.notePosition].click();
+
+    await driver.sleep(1000);
+
+    //switch to alert
+    let alert = await driver.switchTo().alert();
+
+    // handle alert depending on test case
+    if (actions.confirm) {
+      //confirm delete alert
+      await alert.accept();
+
+      await driver.sleep(1000);
+
+      //assert if element is no longer there
+      let isPresent = await driver.findElements({ css: locator });
+      //console.log(isPresent.length);
+      assert.equal(isPresent.length, 0);
+    } else {
+      await alert.dismiss();
+
+      await driver.sleep(1000);
+      //assert if element is still there
+      let isPresent = await driver.findElements({ css: locator });
+      console.log(isPresent.length);
+      assert.equal(isPresent.length, 1);
+    }
+  } catch (e) {
+    console.log(`error ${e} in delNote`);
   }
 }
 
@@ -169,35 +231,82 @@ async function test() {
 
     await driver.get(baseURL);
     await driver.sleep(1000);
+    // confirm this is the expected page
     let pageTitle = await driver.getTitle();
     assert.equal(pageTitle, "Simple Note Taker", "Page Title Mismatch");
 
+    // loop through test cases
     for (let i = 0; i < testcases.length; i++) {
       let testcase = testcases[i];
-      console.log(testcase.testID);
+      /* console.log(testcase.testID);
+      console.log(testcase.actions.action[0]); */
+
+      // store current number of notes for later assertions
+      let noOfNotes = Number(
+        (await driver.findElements({ css: ".note-in-list" })).length
+      );
+      //console.log(`current number of notes ${noOfNotes}`);
+
+      // handle different test case actions
       if (testcase.actions.action[0] == "createNewNote") {
-        let noteListLength = (
-          await driver.findElements({ css: ".note-in-list" })
-        ).length;
-        console.log(noteListLength);
-        console.log(testcase.actions.infoText);
+        //handle note creation from scratch
+        //console.log(testcase.actions.infoText);
+
         let result = await inputOutput(driver, testcase.actions);
         assert.equal(result, testcase.actions.infoText);
       } else if (testcase.actions.action[0] == "openNote") {
-        console.log(testcase.actions.notePosition);
+        // handle open existing note for editing - actual editing or creating copy handled in inputOutput
+
+        //console.log(testcase.actions.notePosition);
+
+        // find alle edit buttons
         let editButtons = await driver.findElements({
           css: ".edit-note-in-list",
         });
+        // click edit button for note position
         await editButtons[testcase.actions.notePosition].click();
         await driver.sleep(1000);
+
+        // call inputOutput for actual text input handling
         let result = await inputOutput(driver, testcase.actions);
+
+        // assert note status
         assert.equal(result, testcase.actions.infoText);
+      } else if (testcase.actions.action[0] == "delNote") {
+        // handle clicking of delete-button for note in position
+        await delNote(driver, testcase.actions);
+      } else {
+        console.log("actions not recognized");
       }
+      // store number of notes after action
+      let newNoOfNotes = (await driver.findElements({ css: ".note-in-list" }))
+        .length;
+      //console.log(`new number of notes: ${newNoOfNotes}`);
+
+      // check result according to test case
+      if (testcase.actions.btn == "add-note") {
+        assert.equal(noOfNotes + 1, newNoOfNotes);
+      } else if (testcase.actions.btn == "update-note") {
+        assert.equal(noOfNotes, newNoOfNotes);
+      } else if (
+        testcase.actions.btn == "delete-note-in-list" &&
+        testcase.actions.confirm
+      ) {
+        assert.equal(noOfNotes - 1, newNoOfNotes);
+      } else if (
+        testcase.actions.btn == "delete-note-in-list" &&
+        !testcase.actions.confirm
+      ) {
+        assert.equal(noOfNotes, newNoOfNotes);
+      }
+      console.log(
+        `testcase ${testcase.testID}: ${testcase.description} passed`
+      );
     }
   } catch (e) {
     console.log(e);
   } finally {
-    //await driver.quit();
+    await driver.quit();
   }
 }
 
