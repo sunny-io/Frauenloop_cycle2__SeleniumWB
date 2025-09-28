@@ -209,7 +209,7 @@ async function delNote(driver, actions) {
 
       //assert if element is no longer there
       let isPresent = await driver.findElements({ css: locator });
-      //console.log(isPresent.length);
+
       assert.equal(isPresent.length, 0);
     } else {
       await alert.dismiss();
@@ -217,7 +217,7 @@ async function delNote(driver, actions) {
       await driver.sleep(1000);
       //assert if element is still there
       let isPresent = await driver.findElements({ css: locator });
-      console.log(isPresent.length);
+
       assert.equal(isPresent.length, 1);
     }
   } catch (e) {
@@ -245,19 +245,15 @@ async function test() {
       let noOfNotes = Number(
         (await driver.findElements({ css: ".note-in-list" })).length
       );
-      //console.log(`current number of notes ${noOfNotes}`);
 
       // handle different test case actions
       if (testcase.actions.action[0] == "createNewNote") {
         //handle note creation from scratch
-        //console.log(testcase.actions.infoText);
 
         let result = await inputOutput(driver, testcase.actions);
         assert.equal(result, testcase.actions.infoText);
       } else if (testcase.actions.action[0] == "openNote") {
         // handle open existing note for editing - actual editing or creating copy handled in inputOutput
-
-        //console.log(testcase.actions.notePosition);
 
         // find alle edit buttons
         let editButtons = await driver.findElements({
@@ -281,7 +277,6 @@ async function test() {
       // store number of notes after action
       let newNoOfNotes = (await driver.findElements({ css: ".note-in-list" }))
         .length;
-      //console.log(`new number of notes: ${newNoOfNotes}`);
 
       // check result according to test case
       if (testcase.actions.btn == "add-note") {
