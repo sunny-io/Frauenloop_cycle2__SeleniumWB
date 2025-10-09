@@ -37,34 +37,58 @@ const guiLocators = {
   answer: "triangle-type",
 };
 
+//put all testSets in one variable to loop through them all
+const testSets = [
+  { name: "MT-A001", data: testSetEqui },
+  { name: "MT-A002", data: testSetScalene },
+  { name: "MT-A003", data: testSetIso },
+  { name: "MT-A004", data: testSetNaT },
+  { name: "MT-A005", data: testDataNan },
+  { name: "T008", data: testDataVeryLarge },
+];
+
 async function inputOutput(driver, testcase) {
+  //clear fields before new input
+  await driver.findElement({ id: guiLocators.input1 }).clear();
+  await driver.findElement({ id: guiLocators.input2 }).clear();
+  await driver.findElement({ id: guiLocators.input3 }).clear();
+  await driver.sleep(500);
+
+  //fill fields
   await driver
     .findElement({ id: guiLocators.input1 })
     .sendKeys(testcase.input[0]);
-  await driver.sleep(1000);
+  await driver.sleep(500);
   await driver
     .findElement({ id: guiLocators.input2 })
     .sendKeys(testcase.input[1]);
 
-  await driver.sleep(1000);
+  await driver.sleep(500);
   await driver
     .findElement({ id: guiLocators.input3 })
     .sendKeys(testcase.input[2]);
-  await driver.sleep(1000);
+  await driver.sleep(500);
 
+  //click button to eveluate input
   await driver.findElement({ id: "identify-triangle-action" }).click();
-  await driver.sleep(1000);
+  await driver.sleep(500);
+
+  //assert output
   let answer = await driver.findElement({ id: "triangle-type" }).getText();
 
   assert.equal(answer, testcase.output, "Expected did not match actual answer");
+  await driver.executeScript(
+    "document.getElementById('triangle-type').textContent = '';"
+  );
+  await driver.sleep(500);
 }
 
-async function test() {
+async function test(testset) {
   try {
     var driver = await new Builder().forBrowser(Browser.CHROME).build();
 
     await driver.get(baseURL);
-    await driver.sleep(1000);
+    await driver.sleep(500);
     assert.equal(
       await driver.getTitle(),
       "Triangle",
@@ -85,9 +109,18 @@ async function test() {
       id: "identify-triangle-action",
     });
     assert.isDefined(checkBtn, "Button 'Identify Triangle Type' not found");
+    console.log("All input elements present");
 
-    // toDo: build loop for all testcases
-    await inputOutput(driver, testSetIso[0]); //POC the setup works
+    // loop for all testcases in set
+
+    for (let i = 0; i < testset.data.length; i++) {
+      //call inputOutput for testset.data[i]
+      //console.table(testset.data[i]);
+      await inputOutput(driver, testset.data[i]);
+
+      //log sucessfull test
+      console.log(`${testset.name} test ${i + 1}: success`);
+    }
   } catch (e) {
     console.log(e);
   } finally {
@@ -95,4 +128,15 @@ async function test() {
   }
 }
 
-test();
+async function runAll(testSets) {
+  //each testSet runs in its own browser instance
+  try {
+    for (let i = 0; i < testSets.length; i++) {
+      await test(testSets[i]);
+    }
+  } catch (e) {
+    console.log(`error ${e} in testSets loop`);
+  }
+}
+
+runAll(testSets);

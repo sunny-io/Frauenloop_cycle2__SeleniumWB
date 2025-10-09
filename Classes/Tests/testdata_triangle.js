@@ -18,11 +18,11 @@ const testSetEqui = [
 ];
 
 const testDataNan = [
-  { input: [1, 1], output: "Error: Side 3 is missing" },
+  { input: [1, 1, ""], output: "Error: Side 3 is missing" },
   { input: [4, -4, 4], output: "Error: Not a Triangle" },
-  { input: [("a", 2, 3)], output: "Error: Side 1 is not a Number" },
+  { input: ["a", 2, 3], output: "Error: Side 1 is not a Number" },
   { input: [2, "b", 4], output: "Error: Side 2 is not a Number" },
-  { input: [3, 4, "c"], output: "Error: Side 3 is not a Number" },
+  { input: [3, 4, "%"], output: "Error: Side 3 is not a Number" },
 ];
 
 const testDataVeryLarge = [
