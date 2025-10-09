@@ -70,11 +70,11 @@ async function inputOutput(driver, testcase) {
   await driver.sleep(500);
 
   //click button to eveluate input
-  await driver.findElement({ id: "identify-triangle-action" }).click();
+  await driver.findElement({ id: guiLocators.button }).click();
   await driver.sleep(500);
 
   //assert output
-  let answer = await driver.findElement({ id: "triangle-type" }).getText();
+  let answer = await driver.findElement({ id: guiLocators.answer }).getText();
 
   assert.equal(answer, testcase.output, "Expected did not match actual answer");
   await driver.executeScript(
