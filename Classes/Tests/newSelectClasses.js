@@ -55,12 +55,17 @@ async function testWeekdaySelect(driver, daysOfWeek) {
 }
 
 async function testMultiselect(driver, multiSelection) {
+  const selectElement = await driver.findElement(By.id("state-select"));
+  const select = new Select(selectElement);
   try {
-    const selectElement = await driver.findElement(By.id("state-select"));
-    const select = new Select(selectElement);
     for (let i = 0; i < multiSelection.length; i++) {
       await select.selectByVisibleText(multiSelection[i]);
+
+      driver.sleep(500);
     }
+    let selected = await select.getAllSelectedOptions();
+
+    console.log(await selected[0].getText());
     //assert first selected
     await driver.findElement({ id: "first-selected-btn" }).click();
 
@@ -79,8 +84,17 @@ async function testMultiselect(driver, multiSelection) {
     assert.equal(
       firstSelectDisplaySelect,
       multiSelection[0],
-      "Display of first selected does not match first element"
+      "Display test of first selected does not match first element"
     );
+    /* 
+    let selected = await select.getAllSelectedOptions();
+    
+    console.log(await selected[0].getText());
+    assert.equal(
+      firstSelected,
+      multiSelection[0],
+      "First selected does not match first element"
+    ); */
     console.log(`Test for first selected passed `);
 
     //assert first selected
@@ -106,9 +120,10 @@ async function testMultiselect(driver, multiSelection) {
       "Display of all selected does not match first element"
     );
     console.log(`Test for all selected passed `);
-    await select.deselectAll();
   } catch (e) {
     console.log(`error ${e} in TestMultiselect`);
+  } finally {
+    await select.deselectAll();
   }
 }
 
