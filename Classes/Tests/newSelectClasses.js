@@ -27,8 +27,8 @@ const daysOfWeek = [
   "Sunay", // spelling error to make sure there test fails if option is not found
 ];
 
-const multiOne = ["California", "Pennsylvania", "Ohio"]; //first selection appears first in list
-const multiTwo = ["Ohio", "New Jersey", "Florida", "Texas"]; //first selection does not appear in list
+const multiOne = ["California", "Pennsylvania", "Ohio"]; //first option appears first in list
+const multiTwo = ["Ohio", "New Jersey", "Florida", "Texas"]; //first option does not appear in list
 
 async function testWeekdaySelect(driver, daysOfWeek) {
   try {
@@ -63,9 +63,20 @@ async function testMultiselect(driver, multiSelection) {
 
       driver.sleep(500);
     }
+    // get them befor clicking!
     let selected = await select.getAllSelectedOptions();
+    //get all Selected options
+    let allSelectedRaw = await select.getAllSelectedOptions();
+    let allSelectedText = [];
+    for (let option of allSelectedRaw) {
+      allSelectedText.push(await option.getText());
+    }
 
-    console.log(await selected[0].getText());
+    allSelectedText = allSelectedText.join(", ");
+    //This also only gives me the option that comes first in the DOM-Tree (equals allSelected Text before the join).
+    let firstSelected = await select.getFirstSelectedOption();
+    let firstSelectedText = await firstSelected.getText();
+
     //assert first selected
     await driver.findElement({ id: "first-selected-btn" }).click();
 
@@ -81,23 +92,27 @@ async function testMultiselect(driver, multiSelection) {
       })
       .getText();
 
+    // assert correct text before output
+    assert.include(firstSelectDisplay, "First selected option is");
+
+    // assert first item selected in the selection box matches the first item in the input array
+
+    assert.equal(
+      firstSelectedText,
+      multiSelection[0],
+      "Selected first item does not match first element in multiselect-array"
+    );
+
+    //assert the first selected in the selection box matches the display below the box
     assert.equal(
       firstSelectDisplaySelect,
-      multiSelection[0],
-      "Display test of first selected does not match first element"
+      firstSelectedText,
+      "Display text of first selected does not match first element"
     );
-    /* 
-    let selected = await select.getAllSelectedOptions();
-    
-    console.log(await selected[0].getText());
-    assert.equal(
-      firstSelected,
-      multiSelection[0],
-      "First selected does not match first element"
-    ); */
+
     console.log(`Test for first selected passed `);
 
-    //assert first selected
+    //assert all selected
     await driver.findElement({ id: "first-selected-btn" }).click();
 
     let allSelectDisplay = await driver
@@ -112,11 +127,13 @@ async function testMultiselect(driver, multiSelection) {
       })
       .getText();
 
-    let expectedAll = multiSelection.join(", ");
+    // Slice, sort and join multiselect array to compare against output
+    let expectedAll = multiSelection.slice().sort().join(", ");
 
+    //assert expected and actual match
     assert.equal(
-      allSelectDisplaySelect,
-      multiSelection[0],
+      allSelectedText,
+      expectedAll,
       "Display of all selected does not match first element"
     );
     console.log(`Test for all selected passed `);
@@ -138,7 +155,8 @@ async function test() {
       "Advanced Select List Demos",
       "page Title does not match"
     ); // check page
-    //await testWeekdaySelect(driver, daysOfWeek);
+
+    await testWeekdaySelect(driver, daysOfWeek);
     console.log("test MultiOne");
     await testMultiselect(driver, multiOne);
 
