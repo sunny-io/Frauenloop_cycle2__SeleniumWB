@@ -63,7 +63,7 @@ async function testMultiselect(driver, multiSelection) {
 
       driver.sleep(500);
     }
-    // get them befor clicking!
+    // get them before clicking
     let selected = await select.getAllSelectedOptions();
     //get all Selected options
     let allSelectedRaw = await select.getAllSelectedOptions();
@@ -71,11 +71,8 @@ async function testMultiselect(driver, multiSelection) {
     for (let option of allSelectedRaw) {
       allSelectedText.push(await option.getText());
     }
-
+    let firstSelectedText = allSelectedText[0];
     allSelectedText = allSelectedText.join(", ");
-    //This also only gives me the option that comes first in the DOM-Tree (equals allSelected Text before the join).
-    let firstSelected = await select.getFirstSelectedOption();
-    let firstSelectedText = await firstSelected.getText();
 
     //assert first selected
     await driver.findElement({ id: "first-selected-btn" }).click();
@@ -95,12 +92,12 @@ async function testMultiselect(driver, multiSelection) {
     // assert correct text before output
     assert.include(firstSelectDisplay, "First selected option is");
 
-    // assert first item selected in the selection box matches the first item in the input array
-
+    // assert first item selected (DOM sequence) in the selection box matches item in sorted input
+    let firstSequencial = multiSelection.slice().sort()[0];
     assert.equal(
       firstSelectedText,
-      multiSelection[0],
-      "Selected first item does not match first element in multiselect-array"
+      firstSequencial,
+      "Selected first item does not match first element of sorted list"
     );
 
     //assert the first selected in the selection box matches the display below the box
