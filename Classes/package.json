@@ -4,15 +4,17 @@
   "description": "testing practices with selenium webdriver",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"no tests fourn\""
+    "test": "mocha"
   },
   "author": "sunny-io",
   "license": "ISC",
   "dependencies": {
     "chromedriver": "^140.0.2",
+    "mocha-each": "^2.0.1",
     "selenium-webdriver": "^4.35.0"
   },
   "devDependencies": {
-    "chai": "^6.0.1"
+    "chai": "^6.0.1",
+    "mocha": "^11.7.4"
   }
 }

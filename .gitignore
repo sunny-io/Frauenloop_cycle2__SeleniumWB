@@ -5,3 +5,5 @@ Classes/Adblock-Plus.zip
 .DS_Store
 .DS_Store
 .DS_Store
+Classes/Tests/try.js
+Classes/node_modules/testMochaThere.js
