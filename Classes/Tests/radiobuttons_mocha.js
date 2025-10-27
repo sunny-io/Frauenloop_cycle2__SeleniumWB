@@ -76,12 +76,12 @@ describe("Testsuit", function () {
     ["male-single", "Male"],
     ["female-single", "Female"],
   ]).it(
-    "Check option % and assert result %",
+    "Check option %s and assert result %s",
     async function (checkID, expected) {
       await rbContainer.setRadioOption(checkID);
       let isSelected = await rbContainer.isSelected(checkID);
       let result = await rbContainer.readResult("single-radio-output");
-      assert.contains(result, expected);
+      assert.include(result, expected);
       assert.isTrue(isSelected);
     }
   );
