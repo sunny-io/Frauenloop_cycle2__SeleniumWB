@@ -3,6 +3,7 @@ const { Builder, By, Key, until } = require("selenium-webdriver");
 require("chromedriver");
 const { assert } = require("chai");
 const fs = require("fs");
+const forEach = require("mocha-each");
 
 class Login {
   constructor(url) {
