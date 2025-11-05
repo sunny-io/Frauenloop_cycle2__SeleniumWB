@@ -9,7 +9,7 @@
   "author": "sunny-io",
   "license": "ISC",
   "dependencies": {
-    "chromedriver": "^140.0.2",
+    "chromedriver": "^142.0.0",
     "mocha-each": "^2.0.1",
     "selenium-webdriver": "^4.35.0"
   },
