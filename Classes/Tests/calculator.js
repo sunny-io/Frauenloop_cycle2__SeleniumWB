@@ -1,5 +1,6 @@
 // load all required modules
 //const assert = require("node:assert"); //not importing node assert but chai
+//testsite updated to new url and titel
 const {
   WebDriver,
   until,
@@ -17,8 +18,9 @@ const chai = require("chai");
 const assert = chai.assert;
 
 // test data
-const baseURL = "https://testpages.eviltester.com/styled/calculator"; // replace by page to test
-const expectedTitle = "Selenium Simplified Calculator"; //fill in expected page title to assert you opened the right one
+const baseURL =
+  "https://testpages.eviltester.com/apps/calculator-api/form-calculator/"; // replace by page to test
+const expectedTitle = "Server Side Calculator Using API | Test Pages"; //fill in expected page title to assert you opened the right one
 
 //locators for important elements
 // calculator form
@@ -39,7 +41,7 @@ async function checkElementsDefined(driver, elements) {
         await driver.findElement({ id: elements[i] }),
         `element with id ${elements[i]} not found`
       );
-      console.log("all elements found");
+      //console.log("all elements found");
     }
   } catch (e) {
     console.log(`error ${e} in checkElementsDefined`);
@@ -90,7 +92,7 @@ async function fillFieldsAndCheck(driver, testcase) {
     await fillField(driver, field2, testcase.field2);
     await doSelect(driver, testcase.operator);
     await driver.findElement({ id: calBtn }).click();
-
+    await driver.sleep(2000);
     //assert result
     const result = await driver.findElement({ id: answer }).getText();
 
@@ -109,13 +111,12 @@ async function test(testcase) {
     var driver = await new Builder().forBrowser(Browser.CHROME).build();
 
     await driver.get(baseURL);
-    await driver.sleep(500);
+    await driver.sleep(2000);
+    let title = await driver.getTitle();
+    //console.log(`page title ${title}`);
+    //console.log(expectedTitle);
     // check page
-    assert.equal(
-      await driver.getTitle(),
-      expectedTitle,
-      "page Title does not match"
-    );
+    assert.equal(await title, expectedTitle, "page Title does not match");
     // assert specific elements required to execute test
     await checkElementsDefined(driver, [
       field1,
@@ -143,6 +144,6 @@ async function runAllTests() {
   }
 }
 
-//test(testcases[19]);
+//test(testcases[1]);
 
 runAllTests(testcases);

@@ -1,3 +1,4 @@
+//expected results changed to match new version of calculator
 const testcases = [
   {
     name: "t001",
@@ -124,7 +125,7 @@ const testcases = [
     field1: 100,
     field2: "",
     operator: "plus",
-    expected: "ERR",
+    expected: "Error: Empty input",
     description: "Field2 empty",
   },
   {
@@ -132,7 +133,7 @@ const testcases = [
     field1: 100,
     field2: 0,
     operator: "divide",
-    expected: "ERR",
+    expected: "Error: Division by zero",
     description: "Division by 0",
   },
   {
@@ -149,14 +150,14 @@ const testcases = [
     field2: "1/8",
     operator: "plus",
     expected: "11/24",
-    description: "use German notation for decimals",
+    description: "use fraction notation ",
   }, // changed from test sheet bc it doubled #4
   {
     name: "t021",
     field1: "A",
     field2: "B",
     operator: "plus",
-    expected: "ERR",
+    expected: "Error: Unknown token: A",
     description: "input characters instead of numbers",
   },
   {
