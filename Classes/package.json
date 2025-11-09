@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "chai": "^6.0.1",
-    "mocha": "^11.7.4"
+    "mocha": "^11.7.4",
+    "mocha-simple-html-reporter": "^2.0.0"
   }
 }
