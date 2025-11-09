@@ -124,7 +124,7 @@ class Calculator {
     /* let main = await this.driver.findElement(By.css("main"));
     let image = await main.takeScreenshot(); */
     let image = await this.driver.takeScreenshot();
-    console.log(fname);
+
     fs.writeFileSync(fname, image, "base64");
   }
   readPng(img) {
