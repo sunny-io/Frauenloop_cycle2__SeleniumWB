@@ -1,4 +1,4 @@
-//npx mocha ./calculator_mocha.js --no-timeouts
+//npx mocha ./calculator_mocha.js
 const {
   WebDriver,
   until,
@@ -17,7 +17,7 @@ const forEach = require("mocha-each");
 
 const expectedTitle = "Server Side Calculator Using API | Test Pages"; //fill in expected page title to assert you opened the right one
 
-//locators for important elements
+// locators for important elements
 // calculator form
 const locators = {
   field1: By.id("number1"), // first input field
