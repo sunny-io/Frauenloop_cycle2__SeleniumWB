@@ -161,4 +161,18 @@ describe("Testsuit", function () {
 
   }) */
   });
+
+  it.skip("Dnd all elements in sequence", async function () {
+    for (let i = 0; i < 4; i++) {
+      assert.equal(
+        await dndObj.getParent(locators.dragables[i]),
+        "items-to-drag"
+      );
+      await dndObj.dragNDrop(locators.dragables[i]);
+      await dndObj.sleep(500);
+      assert.equal(await dndObj.getParent(locators.dragables[i]), "drop-zone");
+      assert.include(await dndObj.getChildren(locators.listDiv));
+    }
+    await dndObj.getChildren(locators.listDiv, By.css("dropped-item-name"));
+  });
 });
