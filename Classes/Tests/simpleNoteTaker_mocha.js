@@ -100,8 +100,8 @@ class Notetaker {
 
     let currNoteList = [];
     for (let i = 0; i < n.length; i++) {
-      dk = n[i].getAttribute["data-key"];
-      console.log(dk);
+      dk = await n[i].getAttribute["data-key"];
+      console.log(`data-key: ${dk}`);
       currNoteList.push(dk);
     }
     console.log(currNoteList);

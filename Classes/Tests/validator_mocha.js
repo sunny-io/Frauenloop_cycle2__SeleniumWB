@@ -23,7 +23,7 @@ class Validator {
   }
 
   async click() {
-    await this.driver.findElement({ css: 'form input[type:button]' }).click();
+    await this.driver.findElement({ css: "form input[type:button]" }).click();
   }
 
   async sleep(n) {
@@ -52,9 +52,7 @@ class Validator {
   }
 
   async getValMsg() {
-    let msg = await this.driver
-      .findElement({ css: })
-      .getText();
+    let msg = await this.driver.findElement({ css: "" }).getText();
     return msg;
   }
 
@@ -89,7 +87,7 @@ async function test() {
     console.log("opened page from class");
 
     await classTest.setAllInput(9999999);
-    await 
+    //await
   } catch (e) {
     console.log(e);
   } finally {
