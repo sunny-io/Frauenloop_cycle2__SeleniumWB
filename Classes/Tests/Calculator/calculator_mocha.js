@@ -43,8 +43,11 @@ class Calculator {
     await this.driver.get(this.url);
   }
 
-  async resize() {
-    await this.driver.manage().window().maximize();
+  async resize(width, heigth) {
+    await this.driver
+      .manage()
+      .window()
+      .setRect({ width: width, height: heigth });
     await this.sleep(300);
   }
 
@@ -125,9 +128,6 @@ class Calculator {
   }
 
   async takeScreenshot(fname) {
-    //tried to take screenshot of main, didn't work
-    /* let main = await this.driver.findElement(By.css("main"));
-    let image = await main.takeScreenshot(); */
     let image = await this.driver.takeScreenshot();
 
     fs.writeFileSync(fname, image, "base64");
@@ -150,7 +150,7 @@ describe("Testsuit", function () {
 
   beforeEach(async function () {
     await calculator.open();
-    await calculator.resize();
+    await calculator.resize(1504, 1024);
   });
 
   after(async function () {
@@ -181,6 +181,7 @@ describe("Testsuit", function () {
     //newImg = await calculator.readPng(`./calculator-0.png`);
 
     //let savedImg = await calculator.readPng(`./screenshots/calculator-0.png`);
+    //if newImg is actually a copy of savedImg, the assertion works. But why are there differences between screenshots taken at different times?
     //assert.equal(await savedImg, await newImg);
   });
 
@@ -204,11 +205,11 @@ describe("Testsuit", function () {
 
         //asserting the images fails even if their size in byte is identical
         //Checking the hexDump in BBEdit shows a number of differences
-        /* 
+
         let fname = `calculator-${name}.png`;
 
         let newImg = calculator.takeScreenshot(fname);
-
+        /* 
         let savedImg = calculator.readPng(
           `./screenshots/calculator-${name}.png`
         );
