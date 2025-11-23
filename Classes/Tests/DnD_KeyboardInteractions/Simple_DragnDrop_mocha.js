@@ -59,13 +59,15 @@ class Dnd {
     elInfo.text = await el.getText();
     return elInfo;
   }
-  async getChildren(locator1, locator2) {
+  async getChildren() {
     // gets array of ids of direct child elements
     let elList = [];
-    let parent = await this.driver.findElement(locator1);
-    let elements = await parent.findElements(locator2);
+    let parent = await this.driver.findElement(locators.listDiv);
+    let elements = await parent.findElements({ css: "div.dropped-item-name" });
     for (let e of elements) {
-      elList.push(e.getAttribute("id"));
+      let a = await e.getText();
+      //console.log(a);
+      elList.push(a);
     }
     return elList;
   }
@@ -73,11 +75,11 @@ class Dnd {
   async getParent(id) {
     try {
       let locator = "//div[@id=" + "'" + id + "']//parent::*";
-      console.log(locator);
+      //console.log(locator);
       let parent = await this.driver.findElement(By.xpath(locator));
 
       let pID = await parent.getAttribute("id");
-      console.log(pID);
+      // console.log(pID);
       return pID;
     } catch (e) {
       console.log(`error ${e} in getParent`);
@@ -123,11 +125,11 @@ describe("Testsuit", function () {
   const dndObj = new Dnd(baseURL);
 
   before(async function () {
-    await dndObj.open();
+    //await dndObj.open();
   });
 
   beforeEach(async function () {
-    //await dndObj.open();
+    await dndObj.open();
   });
 
   after(async function () {
@@ -135,7 +137,7 @@ describe("Testsuit", function () {
   });
 
   afterEach(async function () {
-    //await dndObj.close();
+    await dndObj.close();
   });
 
   it("Load Page, Assert title and elements", async function () {
@@ -154,15 +156,10 @@ describe("Testsuit", function () {
     await dndObj.dragNDrop(locators.dragables[0]);
     await dndObj.sleep(500);
     assert.equal(await dndObj.getParent(locators.dragables[0]), "drop-zone");
-    assert.include(await dndObj.getChildren(locators.listDiv));
-
-    /* locators.dragables.forEach(({dragable})=> {
-    dndObj.dragNDrop(dragable, locators.targetDiv);
-
-  }) */
+    assert.include(await dndObj.getChildren(), "Draggable 1");
   });
 
-  it.skip("Dnd all elements in sequence", async function () {
+  it("Dnd all elements in sequence", async function () {
     for (let i = 0; i < 4; i++) {
       assert.equal(
         await dndObj.getParent(locators.dragables[i]),
@@ -171,8 +168,22 @@ describe("Testsuit", function () {
       await dndObj.dragNDrop(locators.dragables[i]);
       await dndObj.sleep(500);
       assert.equal(await dndObj.getParent(locators.dragables[i]), "drop-zone");
-      assert.include(await dndObj.getChildren(locators.listDiv));
+      assert.include(await dndObj.getChildren(), `Draggable ${i + 1}`);
     }
+    await dndObj.getChildren(locators.listDiv, By.css("dropped-item-name"));
+  });
+  it("Dnd all elements in reverse sequence", async function () {
+    for (let i = 3; i >= 0; i--) {
+      assert.equal(
+        await dndObj.getParent(locators.dragables[i]),
+        "items-to-drag"
+      );
+      await dndObj.dragNDrop(locators.dragables[i]);
+      await dndObj.sleep(500);
+      assert.equal(await dndObj.getParent(locators.dragables[i]), "drop-zone");
+      assert.include(await dndObj.getChildren(), `Draggable ${i + 1}`);
+    }
+
     await dndObj.getChildren(locators.listDiv, By.css("dropped-item-name"));
   });
 });
