@@ -1,4 +1,4 @@
-//npx mocha ./Calculator/calculator_mocha.js --reporter mocha-simple-html-reporter --reporter-options output=./Calculator/et_calculator_report.html
+//npx mocha ./Calculator/calculator_random_tests.js --reporter mocha-simple-html-reporter --reporter-options output=./Calculator/random_calculator_report.html
 const {
   WebDriver,
   until,
@@ -12,8 +12,11 @@ require("chromedriver");
 const { assert } = require("chai");
 const fs = require("fs");
 const forEach = require("mocha-each");
+const { Generator } = require("./randomTestData_generator");
 
 // test data
+const generator = new Generator();
+const testcases = generator.generateTestSet();
 
 const expectedTitle = "Server Side Calculator Using API | Test Pages"; //fill in expected page title to assert you opened the right one
 
@@ -28,9 +31,6 @@ const locators = {
 };
 //selection list option names
 const selListOptions = ["plus", "times", "minus", "divide"];
-
-// import test data sets
-const { testcases } = require("./testdata_calculator");
 
 class Calculator {
   constructor(url) {
@@ -126,15 +126,6 @@ class Calculator {
   async close() {
     await this.driver.quit();
   }
-
-  async takeScreenshot(fname) {
-    let image = await this.driver.takeScreenshot();
-
-    fs.writeFileSync(fname, image, "base64");
-  }
-  readPng(img) {
-    return fs.readFileSync(img, "base64");
-  }
 }
 
 describe("Testsuit", function () {
@@ -145,12 +136,12 @@ describe("Testsuit", function () {
   );
 
   before(async function () {
-    //await calculator.open()
+    await calculator.open();
+    await calculator.resize(1504, 1024);
   });
 
   beforeEach(async function () {
-    await calculator.open();
-    await calculator.resize(1504, 1024);
+    //await calculator.open();
   });
 
   after(async function () {
@@ -158,7 +149,7 @@ describe("Testsuit", function () {
   });
 
   afterEach(async function () {
-    await calculator.close();
+    //await calculator.close();
   });
 
   it("test page title and input fields", async function () {
@@ -171,21 +162,16 @@ describe("Testsuit", function () {
     assert.isTrue(await calculator.isPresent(locators.answer));
   });
 
-  it("test run testcase 1", async function () {
-    await calculator.setAllInput(testcases[0]);
+  it.skip("test run testcase 1", async function () {
+    let testcase = testcases[0];
+    console.log(testcase);
+    await calculator.setAllInput(testcase);
+
     await calculator.sleep(1000);
     let answer = await calculator.getAnswer();
-    assert.equal(await answer, testcases[0].expected);
-
-    //let newImg = await calculator.takeScreenshot(`./calculator-0.png`);
-    //newImg = await calculator.readPng(`./calculator-0.png`);
-
-    //let savedImg = await calculator.readPng(`./screenshots/calculator-0.png`);
-    //if newImg is actually a copy of savedImg, the assertion works. But why are there differences between screenshots taken at different times?
-    //assert.equal(await savedImg, await newImg);
+    assert.equal(await answer, testcase.expected);
   });
 
-  let count = 0;
   testcases.forEach(
     ({ name, description, field1, field2, operator, expected }) => {
       it(`Testing calculator ${name},${description},${field1}, ${field2}, ${operator} & expecting: ${expected}`, async function () {
@@ -202,19 +188,6 @@ describe("Testsuit", function () {
         await calculator.sleep(1000);
         let answer = await calculator.getAnswer();
         assert.equal(await answer, expected);
-
-        //asserting the images fails even if their size in byte is identical
-        //Checking the hexDump in BBEdit shows a number of differences
-
-        let fname = `calculator-${name}.png`;
-
-        let newImg = calculator.takeScreenshot(fname);
-        /* 
-        let savedImg = calculator.readPng(
-          `./screenshots/calculator-${name}.png`
-        );
-
-        assert.equal(await savedImg, await newImg); */
       });
     }
   );
