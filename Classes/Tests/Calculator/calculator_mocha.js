@@ -10,10 +10,14 @@ const {
 } = require("selenium-webdriver");
 require("chromedriver");
 const { assert } = require("chai");
-const fs = require("fs");
+// const fs = require("fs");
 const forEach = require("mocha-each");
 
+const { Generator } = require("./randomTestData_generator");
+
 // test data
+const generator = new Generator();
+const randomTCs = generator.generateTestSet();
 
 const expectedTitle = "Server Side Calculator Using API | Test Pages"; //fill in expected page title to assert you opened the right one
 
@@ -177,15 +181,9 @@ describe("Testsuit", function () {
     let answer = await calculator.getAnswer();
     assert.equal(await answer, testcases[0].expected);
 
-    //let newImg = await calculator.takeScreenshot(`./calculator-0.png`);
-    //newImg = await calculator.readPng(`./calculator-0.png`);
-
-    //let savedImg = await calculator.readPng(`./screenshots/calculator-0.png`);
-    //if newImg is actually a copy of savedImg, the assertion works. But why are there differences between screenshots taken at different times?
-    //assert.equal(await savedImg, await newImg);
+    //code for asserting agains screenshots removed bc assertion always fails. MacOS-Problem?
   });
 
-  let count = 0;
   testcases.forEach(
     ({ name, description, field1, field2, operator, expected }) => {
       it(`Testing calculator ${name},${description},${field1}, ${field2}, ${operator} & expecting: ${expected}`, async function () {
@@ -202,19 +200,27 @@ describe("Testsuit", function () {
         await calculator.sleep(1000);
         let answer = await calculator.getAnswer();
         assert.equal(await answer, expected);
+      });
+    }
+  );
 
-        //asserting the images fails even if their size in byte is identical
-        //Checking the hexDump in BBEdit shows a number of differences
+  randomTCs.forEach(
+    ({ name, description, field1, field2, operator, expected }) => {
+      it(`Testing calculator ${name},${description},${field1}, ${field2}, ${operator} & expecting: ${expected}`, async function () {
+        let testcase = {
+          name,
+          description,
+          field1,
+          field2,
+          operator,
+          expected,
+        }; //recreating the testcase to match expected structure for methods
 
-        let fname = `calculator-${name}.png`;
-
-        let newImg = calculator.takeScreenshot(fname);
-        /* 
-        let savedImg = calculator.readPng(
-          `./screenshots/calculator-${name}.png`
-        );
-
-        assert.equal(await savedImg, await newImg); */
+        await calculator.setAllInput(testcase);
+        await calculator.sleep(1000);
+        let answer = await calculator.getAnswer();
+        // random division assertions fail due to rounding in calculatr, decide on method to round expected
+        assert.equal(await answer, expected);
       });
     }
   );
