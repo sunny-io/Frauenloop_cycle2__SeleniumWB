@@ -1,0 +1,170 @@
+[
+    {
+      "name": "t001",
+      "field1": 55,
+      "field2": 43,
+      "operator": "plus",
+      "expected": 98,
+      "description": "add positive integers"
+    },
+    {
+      "name": "t002",
+      "field1": 55,
+      "field2": 43,
+      "operator": "minus",
+      "expected": 12,
+      "description": "substract positive integers"
+    },
+    {
+      "name": "t003",
+      "field1": 55,
+      "field2": 43,
+      "operator": "times",
+      "expected": 2365,
+      "description": "multiply positive integers"
+    },
+    {
+      "name": "t004",
+      "field1": 55,
+      "field2": 43,
+      "operator": "divide",
+      "expected": 1.27907,
+      "description": "divide positive integers"
+    },
+    {
+      "name": "t005b",
+      "field1": 55.5,
+      "field2": 43.3,
+      "operator": "plus",
+      "expected": 98.8,
+      "description": "add positive decimals"
+    },
+    {
+      "name": "t006",
+      "field1": -60,
+      "field2": -40,
+      "operator": "plus",
+      "expected": -100,
+      "description": "add negative integers"
+    },
+    {
+      "name": "t007b",
+      "field1": 55.5,
+      "field2": 43.3,
+      "operator": "minus",
+      "expected": 12.2,
+      "description": "substract positive decimals"
+    },
+    {
+      "name": "t008b",
+      "field1": -2.5,
+      "field2": -4.3,
+      "operator": "minus",
+      "expected": 1.8,
+      "description": "substract negative decimals"
+    },
+    {
+      "name": "t009",
+      "field1": 10,
+      "field2": -8,
+      "operator": "minus",
+      "expected": 18,
+      "description": "substract negative from positive integer"
+    },
+    {
+      "name": "t010b",
+      "field1": 20.5,
+      "field2": 60,
+      "operator": "times",
+      "expected": 1230,
+      "description": "multiply positive decimals"
+    },
+    {
+      "name": "t011",
+      "field1": -20,
+      "field2": -60,
+      "operator": "times",
+      "expected": 1200,
+      "description": "multiply negative integers"
+    },
+    {
+      "name": "t012",
+      "field1": -20,
+      "field2": 30,
+      "operator": "times",
+      "expected": -600,
+      "description": "multiply one negative and one positive integer"
+    },
+    {
+      "name": "t013b",
+      "field1": 55.5,
+      "field2": 43.3,
+      "operator": "divide",
+      "expected": 1.281755,
+      "description": "divide positive decimals"
+    },
+    {
+      "name": "t014",
+      "field1": 100,
+      "field2": -4,
+      "operator": "divide",
+      "expected": -25,
+      "description": "divide positive integer by negative integer"
+    },
+    {
+      "name": "t015",
+      "field1": -100,
+      "field2": -4,
+      "operator": "divide",
+      "expected": 25,
+      "description": "divide negative integers"
+    },
+    {
+      "name": "t016",
+      "field1": 100,
+      "field2": "",
+      "operator": "plus",
+      "expected": "Error: Empty input",
+      "description": "Field2 empty"
+    },
+    {
+      "name": "t017",
+      "field1": 100,
+      "field2": 0,
+      "operator": "divide",
+      "expected": "Error: Division by zero",
+      "description": "Division by 0"
+    },
+    {
+      "name": "t018",
+      "field1": "0,5",
+      "field2": "0,1",
+      "operator": "plus",
+      "expected": "0,6",
+      "description": "use German notation for decimals"
+    },
+    {
+      "name": "t021",
+      "field1": "1/3",
+      "field2": "1/8",
+      "operator": "plus",
+      "expected": "11/24",
+      "description": "use fraction notation "
+    },
+    {
+      "name": "t021",
+      "field1": "A",
+      "field2": "B",
+      "operator": "plus",
+      "expected": "Error: Unknown token: A",
+      "description": "input characters instead of numbers"
+    },
+    {
+      "name": "t022",
+      "field1": 1234567890111213141516,
+      "field2": 1234567890111213141516,
+      "operator": "times",
+      "expected": 1524157875293652200000000000000000000000000,
+      "description": "input length 22"
+    }
+  ]
