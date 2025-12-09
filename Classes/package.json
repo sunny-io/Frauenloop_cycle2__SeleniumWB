@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "chromedriver": "^142.0.0",
+    "firefox": "^0.0.1",
     "mocha-each": "^2.0.1",
     "selenium-webdriver": "^4.35.0"
   },
